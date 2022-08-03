@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Bionic Reading Ext",
+  "name": "Bionic Reading Extension",
   "version": "0.1.0",
   "description": "My Chrome Extension",
   "icons": {
@@ -13,21 +13,11 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_title": "Bionic Reading Ext",
-    "default_popup": "popup.html"
+
   },
   "permissions": [
-    "storage"
-  ],
-  "content_scripts": [
-    {
-      "matches": [
-        "<all_urls>"
-      ],
-      "run_at": "document_idle",
-      "js": [
-        "contentScript.js"
-      ]
-    }
+    "storage",
+    "activeTab",
+    "scripting"
   ]
 }

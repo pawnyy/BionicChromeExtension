@@ -1,43 +1,52 @@
-'use strict';
+const className = '___BIONIC-READING__'
 
-// Content script file will run in the context of web page.
-// With content script you can manipulate the web pages using
-// Document Object Model (DOM).
-// You can also pass information to the parent extension.
+function addTags() {
+  let styleTags = document.body.getElementsByTagName('style')
+  let styleContents = []
 
-// We execute this script by making an entry in manifest.json file
-// under `content_scripts` property
-
-// For more information on Content Scripts,
-// See https://developer.chrome.com/extensions/content_scripts
-
-// Log `title` of current active web page
-const pageTitle = document.head.getElementsByTagName('title')[0].innerHTML;
-console.log(
-  `Page title is: '${pageTitle}' - evaluated by Chrome extension's 'contentScript.js' file`
-);
-
-// Communicate with background file by sending a message
-chrome.runtime.sendMessage(
-  {
-    type: 'GREETINGS',
-    payload: {
-      message: 'Hello, my name is Con. I am from ContentScript.',
-    },
-  },
-  (response) => {
-    console.log(response.message);
-  }
-);
-
-// Listen for message
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.type === 'COUNT') {
-    console.log(`Current count is ${request.payload.count}`);
+  for (let tag of styleTags) {
+    styleContents.push(tag.innerHTML)
   }
 
-  // Send an empty response
-  // See https://github.com/mozilla/webextension-polyfill/issues/130#issuecomment-531531890
-  sendResponse({});
-  return true;
-});
+  console.log(styleContents)
+
+  for (let tag of styleTags) {
+    tag.remove()
+  }
+
+  const regex = /(?<!(<\/?[^>]*|&[^;]*))([^\s<]+)/g;
+
+  const content = document.body.innerHTML
+
+  const subst = `<span class="${className}">$&</span>`;
+
+  document.body.innerHTML = content.replace(regex, subst)
+
+  for (let cont of styleContents) {
+    console.log(cont)
+    let style = document.createElement('style')
+    style.innerHTML = cont
+    document.body.appendChild(style)
+  }
+}
+
+String.prototype.insert = function (index, string) {
+  const ind = index < 0 ? this.length + index : index;
+  return  this.substring(0, ind) + string + this.substr(ind);
+};
+
+function main() {
+  addTags()
+
+  let words = document.getElementsByClassName(className)
+  for (let elem of words) {
+    let word = elem.innerText
+    let length = word.length
+    let half = Math.floor(length / 2)
+    word = word.insert(half, '</strong>')
+    word = '<strong>'+word
+    elem.innerHTML = word
+  }
+}
+
+main()
